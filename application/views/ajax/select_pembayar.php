@@ -47,6 +47,8 @@
 				$('#inputHiddenIdAnggota').val(respon.id_anggota);
 				$('#inputHiddenIdPeriode').val(respon.id_periode);
 				$('#inputHiddenNominal').val(respon.nominal);
+				$('#inputHiddenSaldo').val(respon.saldo);
+				$('#infoSaldoViaTabungan').text(respon.saldo);
 			})
 			.fail(function(respon){
 				alert(respon.pesan);

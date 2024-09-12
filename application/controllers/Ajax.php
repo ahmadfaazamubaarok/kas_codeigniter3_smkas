@@ -24,7 +24,8 @@ class Ajax extends CI_Controller{
 				'id_periode'	=> $periode->id_periode,
 				'nama_anggota'	=> $pembayar->nama_anggota,
 				'periode' 		=> $periode->periode,
-				'nominal'		=> $periode->nominal
+				'nominal'		=> $periode->nominal,
+				'saldo'			=> $pembayar->saldo
 			];
 		} else {
 			$info = [
@@ -40,14 +41,15 @@ class Ajax extends CI_Controller{
 		$id_anggota = $this->input->post('id_anggota');
 		$id_periode = $this->input->post('id_periode');
 		$nominal = $this->input->post('nominal');
-
+		
 		$pemasukan = [
 			'id_pemasukan'  => 'KM'.date('ymdhis'),
 			'anggota' 		=> $id_anggota,
 			'bendahara' 	=> $this->session->userdata('id_bendahara'),
 			'nominal'		=> $nominal,
 			'waktu'			=> date('Y-m-d'),
-			'periode'		=> $id_periode
+			'periode'		=> $id_periode,
+			'metode'		=> 'tunai'
 		];
 
 		$hutang = $this->kas_model->get_hutang_by_id_anggota_id_periode($id_periode, $id_anggota);
@@ -68,6 +70,63 @@ class Ajax extends CI_Controller{
 		}
 
 		echo json_encode($info);
+	}
+
+	public function simpan_pemasukan_via_tabungan(){
+		$id_anggota = $this->input->post('id_anggota');
+		$id_periode = $this->input->post('id_periode');
+		$nominal = $this->input->post('nominal');
+		$saldo = $this->input->post('saldo');
+		if ($nominal > $saldo) {//jika saldo kurang
+			echo json_encode(['success' => false]);
+		} else {
+			$pemasukan = [
+				'id_pemasukan'  => 'KM'.date('ymdhis'),
+				'anggota' 		=> $id_anggota,
+				'bendahara' 	=> $this->session->userdata('id_bendahara'),
+				'nominal'		=> $nominal,
+				'waktu'			=> date('Y-m-d'),
+				'periode'		=> $id_periode,
+				'metode'		=> 'tabungan'
+			];
+
+			$saldo_baru = $saldo - $nominal;
+
+			$tabungan = [
+				'id_tabungan' 	=> 'TB'.date('ymdhis'),
+				'anggota'		=> $id_anggota,
+				'waktu'			=> date('Y-m-d'),
+				'nominal'		=> $nominal,
+				'keterangan'	=> 'keluar',
+				'saldo'			=> $saldo_baru
+			];
+
+			$data = [
+				'saldo'			=> $saldo_baru
+			];
+
+			$inserted_tabungan 	= $this->kas_model->insert_tabungan($tabungan);
+			$updated_anggota 	= $this->kas_model->update_anggota($id_anggota, $data);
+			$hutang 			= $this->kas_model->get_hutang_by_id_anggota_id_periode($id_periode, $id_anggota);
+			$hapus_hutang 		= $this->kas_model->hapus_hutang($hutang->id_hutang);
+			$inserted 			= $this->kas_model->insert_pemasukan($pemasukan);
+			$updated_saldo 		= $this->kas_model->tambah_saldo($nominal);
+			
+			if ($inserted && $updated_saldo && $hapus_hutang && $updated_anggota && $inserted_tabungan) {
+				$info = [
+					'hasil' => TRUE,
+					'pesan' => 'Berhasil melakukan transaksi.'
+				];
+			} else {
+				$info = [
+					'hasil' => FALSE,
+					'pesan' => 'Gagal melakukan transaksi.'
+				];
+			}
+
+			echo json_encode($info);
+		}
+
 	}
 
 	public function simpan_penarikan() {
@@ -256,6 +315,7 @@ class Ajax extends CI_Controller{
 		foreach ($data['data_anggota'] as $anggota) {
 			$id_anggota = $anggota->id_anggota;
 			$anggota->hutang = $this->kas_model->get_hutang_by_anggota($id_anggota);
+			$anggota->tabungan = $this->kas_model->get_tabungan_by_anggota($id_anggota);
 		}
 		// var_dump($data['data_anggota']);
 		// die();
@@ -299,6 +359,69 @@ class Ajax extends CI_Controller{
 	    } else {
 	        echo json_encode(['status' => 'error', 'message' => 'Gagal memproses pembayaran.']);
 	    }
+	}
+
+	public function bayar_tanggungan_via_tabungan(){
+	    // Ambil data dari POST
+	    $id_hutang  = $this->input->post('id_hutang');
+	    $id_periode = $this->input->post('id_periode');
+	    $id_anggota = $this->input->post('id_anggota');
+	    $nominal    = $this->input->post('nominal');
+	    $saldo 		= $this->input->post('saldo');
+
+	    if ($nominal > $saldo) {//jika saldo kurang
+			echo json_encode(['success' => false]);
+		} else {
+		    // Cek periode aktif
+		    $tepat_waktu = $this->kas_model->get_periode_aktif_by_id($id_periode);
+		    if ($tepat_waktu) {
+		        $status = 'tepat waktu';
+		    } else {
+		        $status = 'terlambat';
+		    }
+
+		    // Buat data pemasukan
+		    $pemasukan = [
+		        'id_pemasukan'  => 'KM'.date('ymdhis'),
+		        'anggota'       => $id_anggota,
+		        'bendahara'     => $this->session->userdata('id_bendahara'),
+		        'nominal'       => $nominal,
+		        'waktu'         => date('Y-m-d'),
+		        'periode'       => $id_periode,
+		        'status'        => $status,
+		        'metode'		=> 'tabungan'
+		    ];
+
+		    $saldo_baru = $saldo - $nominal;
+
+			$tabungan = [
+				'id_tabungan' 	=> 'TB'.date('ymdhis'),
+				'anggota'		=> $id_anggota,
+				'waktu'			=> date('Y-m-d'),
+				'nominal'		=> $nominal,
+				'keterangan'	=> 'keluar',
+				'saldo'			=> $saldo_baru
+			];
+
+			$data = [
+				'saldo'			=> $saldo_baru
+			];
+			
+		    // Lakukan insert, update, dan delete
+		    $inserted_tabungan 	= $this->kas_model->insert_tabungan($tabungan);
+			$updated_anggota 	= $this->kas_model->update_anggota($id_anggota, $data);
+			$hutang 			= $this->kas_model->get_hutang_by_id_anggota_id_periode($id_periode, $id_anggota);
+			$hapus_hutang 		= $this->kas_model->hapus_hutang($hutang->id_hutang);
+			$inserted 			= $this->kas_model->insert_pemasukan($pemasukan);
+			$updated_saldo 		= $this->kas_model->tambah_saldo($nominal);
+
+		    // Pastikan semua operasi berhasil
+		    if ($inserted && $updated_saldo && $hapus_hutang && $updated_anggota && $inserted_tabungan) {
+		        echo json_encode(['status' => 'success']);
+		    } else {
+		        echo json_encode(['status' => 'error', 'message' => 'Gagal memproses pembayaran.']);
+		    }
+		}
 	}
 
 	public function hapus_anggota(){
@@ -381,6 +504,7 @@ class Ajax extends CI_Controller{
 		$object->getActiveSheet()->setCellValue('E2', 'Nominal');
 		$object->getActiveSheet()->setCellValue('F2', 'Waktu');
 		$object->getActiveSheet()->setCellValue('G2', 'Status');
+		$object->getActiveSheet()->setCellValue('H2', 'Metode');
 
 		$object->getActiveSheet()->setCellValue('I1', 'Data Pengeluaran');
 		$object->getActiveSheet()->setCellValue('I2', 'No');
@@ -404,6 +528,7 @@ class Ajax extends CI_Controller{
 			$object->getActiveSheet()->setCellValue('E' . $baris, $pemasukan->nominal);
 			$object->getActiveSheet()->setCellValue('F' . $baris, $pemasukan->waktu);
 			$object->getActiveSheet()->setCellValue('G' . $baris, $pemasukan->status);
+			$object->getActiveSheet()->setCellValue('H' . $baris, $pemasukan->metode);
 
 			$baris++;
 		}
@@ -459,5 +584,97 @@ class Ajax extends CI_Controller{
 		}
 	    // Load view dengan data yang didapat dari model
 	    $this->load->view('ajax/live_search_periode', $data);
+	}
+
+	public function pilih_nasabah(){
+		$data['list_anggota'] = $this->kas_model->get_anggota();
+		$this->load->view('ajax/select_nasabah',$data);
+	}
+
+	public function cari_nasabah(){
+		$formPilihAnggota = $this->input->post('formPilihNasabah');
+
+		parse_str($formPilihAnggota, $data);
+		$id_anggota = $data['id_anggota'];
+		$pembayar = $this->kas_model->get_anggota_by_id($id_anggota);
+
+		if ($pembayar) {
+			$info = [
+				'hasil'			=> TRUE,
+				'pesan'			=> 'Menampilkan data pembayar.',
+				'id_anggota'	=> $pembayar->id_anggota,
+				'nama_anggota'	=> $pembayar->nama_anggota,
+				'saldo'			=> $pembayar->saldo
+			];
+		} else {
+			$info = [
+				'hasil' => FALSE,
+				'pesan' => 'Gagal menampilkan data pembayar.'
+			];
+		}
+
+		echo json_encode($info);
+	}
+
+	public function tabungan_masuk(){
+		$id_anggota = $this->input->post('id_anggota');
+		$nominal = $this->input->post('nominal');
+		// $id_anggota = 'AG240831043629';
+		// $nominal = 1000;
+
+		$anggota = $this->kas_model->get_anggota_by_id($id_anggota);
+		$saldo = $anggota->saldo;
+		$saldo_baru = $saldo + $nominal;
+
+		$tabungan = [
+			'id_tabungan' 	=> 'TB'.date('ymdhis'),
+			'anggota'		=> $id_anggota,
+			'waktu'			=> date('Y-m-d'),
+			'nominal'		=> $nominal,
+			'keterangan'	=> 'masuk',
+			'saldo'			=> $saldo_baru
+		];
+
+		$data = [
+			'saldo'			=> $saldo_baru
+		];
+
+		$this->kas_model->insert_tabungan($tabungan);
+		$this->kas_model->update_anggota($id_anggota, $data);
+
+		echo json_encode(['success' => true]);
+	}
+
+	public function tabungan_keluar(){
+		$id_anggota = $this->input->post('id_anggota');
+		$nominal = $this->input->post('nominal');
+		// $id_anggota = 'AG240831043629';
+		// $nominal = 1000;
+
+		$anggota = $this->kas_model->get_anggota_by_id($id_anggota);
+		$saldo = $anggota->saldo;
+		if ($nominal > $saldo) {//jika saldo kurang
+			echo json_encode(['success' => false]);
+		} else {
+			$saldo_baru = $saldo - $nominal;
+
+			$tabungan = [
+				'id_tabungan' 	=> 'TB'.date('ymdhis'),
+				'anggota'		=> $id_anggota,
+				'waktu'			=> date('Y-m-d'),
+				'nominal'		=> $nominal,
+				'keterangan'	=> 'keluar',
+				'saldo'			=> $saldo_baru
+			];
+
+			$data = [
+				'saldo'			=> $saldo_baru
+			];
+
+			$this->kas_model->insert_tabungan($tabungan);
+			$this->kas_model->update_anggota($id_anggota, $data);
+
+			echo json_encode(['success' => true]);
+		}
 	}
 }

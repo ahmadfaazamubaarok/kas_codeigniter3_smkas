@@ -32,7 +32,7 @@
                             <td class="bg-transparent"><?= $periode->periode ?></td>
                             <td class="bg-transparent">Rp <strong><?= $periode->nominal ?></strong>,00<i class="ti ti-chevron-up text-danger ms-1 fs-4"></i></td>
                             <td class="text-end rounded-end bg-transparent">
-                            	<span class="mx-3 badge bg-<?php if ($periode->status === 'aktif') {echo "success";} else {echo "danger";} ?>" data-aos="flip-left" data-aos-delay="400"><?php if ($periode->status === 'aktif') {echo "Aktif";} else {echo "NonAktif";} ?></span>
+                                <span class="mx-3 badge bg-<?php if ($periode->status === 'aktif') {echo "success";} else {echo "danger";} ?>" data-aos="flip-left" data-aos-delay="400"><?php if ($periode->status === 'aktif') {echo "Aktif";} else {echo "NonAktif";} ?></span>
                                 <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $periode->id_periode ?>" aria-expanded="false" aria-controls="collapseTwo" data-aos="zoom-out" data-aos-delay="500">
                                     <i class="ti ti-info-circle"></i>
                                 </button>
@@ -40,8 +40,7 @@
                                     <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#edit<?= $periode->id_periode ?>" aria-expanded="false" aria-controls="collapseTwo" data-aos="zoom-out" data-aos-delay="600">
                                         <i class="ti ti-edit"></i>
                                     </button>
-                                <?php endif ?>
-                                <?php if ($periode->status === 'tidak'): ?>
+                                <?php else: ?>
                                     <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalHapus<?= $periode->id_periode ?>" data-aos="zoom-out" data-aos-delay="600">
                                         <i class="ti ti-trash"></i>
                                     </button>
@@ -121,7 +120,7 @@
                                                 </div>
                                              </div>
                                              <div class="col-lg-6 d-flex justify-content-end">
-                                                <?php if ($periode->status === 'tidak'): ?>
+                                                <?php if ($periode->status === 'nonaktif'): ?>
                                                     <form action="<?= site_url('ajax/ekspor_excel') ?>" class="border-end pe-4 border-muted border-opacity-10" method="POST">
                                                         <input type="hidden" name="id_periode" value="<?= $periode->id_periode ?>">
                                                         <input type="hidden" name="total_pemasukan" value="<?= $total_pemasukan ?>">
@@ -169,9 +168,10 @@
                                                              <div class="">
                                                                <div class="accordion-item">
                                                                  <div id="info<?= $pemasukan->id_pemasukan ?>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                   <div class="accordion-body">
+                                                                   <div class="accordion-body d-flex justify-content-evenly">
                                                                      <p><strong>Pembayar: </strong><?= $pemasukan->nama_anggota ?></p>
                                                                      <p><strong>Penerima: </strong><?= $pemasukan->username ?></p>
+                                                                     <p><strong>Metode: </strong><?= $pemasukan->metode ?></p>
                                                                    </div>
                                                                  </div>
                                                                </div>
@@ -241,6 +241,12 @@
                                              </div>
                                           </div>
                                         </div>
+                                        <div style="position: relative;">
+                                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; z-index: 1;">
+                                                <span>End of laporan <?= $periode->periode ?></span>
+                                            </div>
+                                            <hr style="z-index: 0; position: relative;">
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -251,9 +257,9 @@
                 </table>
             </div>
         <?php else: ?>
-    	    <div class="alert alert-warning d-flex justify-content-center mt-3">
-    	      <p class="mb-0">Belum ada data periode.</p>
-    	    </div>
+            <div class="alert alert-warning d-flex justify-content-center mt-3">
+              <p class="mb-0">Belum ada data periode.</p>
+            </div>
         <?php endif ?>
         </div>
     </div>
@@ -276,8 +282,8 @@
         </div>
       </div>
       <div class="modal-footer d-flex justify-content-center">
-	        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="hapusPeriode" data-id="<?= $periode->id_periode ?>"><i class="ti ti-trash"></i>Hapus periode</button>
-      	</form>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="hapusPeriode" data-id="<?= $periode->id_periode ?>"><i class="ti ti-trash"></i>Hapus periode</button>
+        </form>
       </div>
     </div>
   </div>
@@ -439,6 +445,41 @@
                 alert('Gagal menambah data: ' + textStatus);
             });
         });
+
+        // Tambah periode dengan menekan Enter
+          $('input[name="periodeBaru"], input[name="nominalBaru"]').keypress(function(event){
+            if(event.which === 13) { // Kode 13 adalah kode untuk tombol Enter
+              event.preventDefault();
+
+              var namaPeriode = $('input[name="periodeBaru"]').val();
+              var nominal = $('input[name="nominalBaru"]').val();
+              if (!namaPeriode || !nominal || nominal <= 0) {
+                $('#alertInputTidakTepat').show();
+                return; // Hentikan proses jika input tidak valid
+              }
+
+              $.ajax({
+                url: '<?= site_url('ajax/tambah_periode') ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                  'formTambahPeriode': $('#formTambahPeriode').serialize()
+                }
+              })
+              .done(function(respon){
+                if (respon.status == 'success') {
+                  $('#tambahPeriode').modal('hide');
+                  $('#modalBerhasilTambah').modal('show');
+                  $('#dataPeriode').load('<?= site_url('ajax/get_periode') ?>');
+                } else {
+                  alert('Gagal menambah data: ' + respon.message);
+                }
+              })
+              .fail(function(jqXHR, textStatus, errorThrown){
+                alert('Gagal menambah data: ' + textStatus);
+              });
+            }
+          });
 
         // Hapus periode
         $(document).on('click', '#hapusPeriode', function(event){

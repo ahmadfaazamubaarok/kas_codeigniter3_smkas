@@ -168,9 +168,10 @@
                                                              <div class="">
                                                                <div class="accordion-item">
                                                                  <div id="info<?= $pemasukan->id_pemasukan ?>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                   <div class="accordion-body">
+                                                                   <div class="accordion-body d-flex justify-content-evenly">
                                                                      <p><strong>Pembayar: </strong><?= $pemasukan->nama_anggota ?></p>
                                                                      <p><strong>Penerima: </strong><?= $pemasukan->username ?></p>
+                                                                     <p><strong>Metode: </strong><?= $pemasukan->metode ?></p>
                                                                    </div>
                                                                  </div>
                                                                </div>
@@ -239,6 +240,12 @@
                                                 <?php endif ?>
                                              </div>
                                           </div>
+                                        </div>
+                                        <div style="position: relative;">
+                                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; z-index: 1;">
+                                                <span>End of laporan <?= $periode->periode ?></span>
+                                            </div>
+                                            <hr style="z-index: 0; position: relative;">
                                         </div>
                                     </div>
                                 </div>

@@ -14,9 +14,11 @@ class Page extends CI_Controller{
 
 	public function index(){
 		$data['total_saldo'] = $this->kas_model->get_saldo();
+		$data['total_saldo_tabungan'] = $this->kas_model->get_total_saldo_tabungan();
+		// var_dump($data['total_tabungan']);
+		// die();
 		$data['total_anggota'] = count($this->kas_model->get_anggota());
 		$data['total_periode'] = count($this->kas_model->get_periode());
-		$data['total_hutang'] = count($this->kas_model->get_hutang());
 
 		$data['total_pemasukan'] = 0;
 		$data['total_pengeluaran'] = 0;
@@ -24,8 +26,6 @@ class Page extends CI_Controller{
 		$total_pengeluaran = $this->kas_model->get_pengeluaran_by_periode_aktif();
 		$data['total_pemasukan'] += $total_pemasukan[0]->nominal;
 		$data['total_pengeluaran'] += $total_pengeluaran[0]->nominal;
-		// var_dump($total_pemasukan[0]->nominal);
-		// die();
 
 		$jumlah_anggota_lunas = count($this->kas_model->get_anggota_lunas());
 		$jumlah_anggota_belum_lunas = count($this->kas_model->get_anggota_belum_lunas());

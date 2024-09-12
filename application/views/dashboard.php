@@ -25,7 +25,7 @@
 			<div class="alert alert-info border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="200">
 				<img src="<?= base_url().'/assets/icon/pemasukan.png' ?>" style="width:80px;">
 				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_pemasukan ?></span>
-				<span>Total Pemasukan</span>
+				<span>Total Kas Masuk</span>
 			</div>
 		</a>
 	</div>
@@ -34,7 +34,7 @@
 			<div class="alert alert-danger border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="300">
 				<img src="<?= base_url().'/assets/icon/pengeluaran.png' ?>" style="width:80px;">
 				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_pengeluaran ?></span>
-				<span>Total Pengeluaran</span>
+				<span>Total Kas Keluar</span>
 			</div>
 		</a>
 	</div>
@@ -51,8 +51,8 @@
 		<a href="<?= site_url('page/anggota') ?>">
 			<div class="alert alert-dark border-0 d-flex justify-content-center align-items-center flex-column text-white" data-aos="flip-left" data-aos-delay="500">
 				<img src="<?= base_url().'/assets/icon/hutang.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder"><?= $total_hutang ?></span>
-				<span>Total Hutang</span>
+				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_saldo_tabungan ?></span>
+				<span>Total Saldo Tabungan</span>
 			</div>
 		</a>
 	</div>

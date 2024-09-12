@@ -34,10 +34,13 @@
       </div>
 			<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist" data-aos="zoom-out" data-aos-delay="200">
 			  <li class="nav-item" role="presentation">
-			    <button class="nav-link <?php if (!$this->session->flashdata('open_pengeluaran')){echo "active";} ?>" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pemasukan" type="button" role="tab" aria-controls="pills-home" aria-selected="true"><i class="ti ti-arrow-down"></i> Pemasukan</button>
+			    <button class="nav-link <?php if (!$this->session->flashdata('open_pengeluaran')){echo "active";} ?>" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pemasukan" type="button" role="tab" aria-controls="pills-home" aria-selected="true"><i class="ti ti-arrow-down"></i> Kas Masuk</button>
 			  </li>
 			  <li class="nav-item" role="presentation">
-			    <button class="nav-link <?php if ($this->session->flashdata('open_pengeluaran')){echo "active";} ?>" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pengeluaran" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"><i class="ti ti-arrow-up"></i> Pengeluaran</button>
+			    <button class="nav-link <?php if ($this->session->flashdata('open_pengeluaran')){echo "active";} ?>" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pengeluaran" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"><i class="ti ti-arrow-up"></i> Kas Keluar</button>
+			  </li>
+			  <li class="nav-item" role="presentation">
+			    <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#tabungan" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"><i class="ti ti-database"></i> Tabungan</button>
 			  </li>
 			</ul>
 		</div>
@@ -69,24 +72,45 @@
 				</div>
 		  </div>
 		  <div class="tab-pane fade <?php if ($this->session->flashdata('open_pengeluaran')){echo "show active";} ?>" id="pengeluaran" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
-			<div class="alert alert-warning fade show mt-3 w-100" role="alert">
-				<div class="d-flex justify-content-between">
-					<h4>Peringatan!</h4>
-					<div>
-						<span>Total saldo:</span>
-						<h4 id="totalSaldo"></h4>
+				<div class="alert alert-warning fade show mt-3 w-100" role="alert">
+					<div class="d-flex justify-content-between">
+						<h4>Peringatan!</h4>
+						<div>
+							<span>Total saldo:</span>
+							<h4 id="totalSaldo"></h4>
+						</div>
+					</div>
+					<p class="mb-0">Transaksi Penarikan hanya <strong>Bendahara</strong> yang dapat mengaksesnya.</p>
+					<p>Untuk keamanan hak akses, dimohon untuk mengisi kolom password terlebih dahulu untuk melanjutkan proses penarikan saldo kas.</p>
+					<div class="d-flex justify-content-end" data-aos="zoom-out" data-aos-delay="300">
+						<?php if ($this->session->userdata('periode')):?>
+						<button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPenarikan">Lanjutkan Penarikan</button>
+						<?php else: ?>
+						<span class="text-danger">Tidak bisa menarik, belum ada periode aktif</span>
+						<?php endif ?>
 					</div>
 				</div>
-				<p class="mb-0">Transaksi Penarikan hanya <strong>Bendahara</strong> yang dapat mengaksesnya.</p>
-				<p>Untuk keamanan hak akses, dimohon untuk mengisi kolom password terlebih dahulu untuk melanjutkan proses penarikan saldo kas.</p>
-				<div class="d-flex justify-content-end" data-aos="zoom-out" data-aos-delay="300">
-					<?php if ($this->session->userdata('periode')):?>
-					<button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalPenarikan">Lanjutkan Penarikan</button>
-					<?php else: ?>
-					<span class="text-danger">Tidak bisa menarik, belum ada periode aktif</span>
-					<?php endif ?>
-				</div>
-			</div>
+		  </div>
+		  <div class="tab-pane fade" id="tabungan" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+				<div id="pilihNasabah"></div>
+				<div class="card" id="infoNasabah" style="display:none;">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-lg-8">
+									<span>Nama: <h4 id="namaNasabah">Ahmad Faaza Mubaarok</h4></span>
+								</div>
+								<div class="col-lg-4">
+									<div class="d-flex justify-content-between align-items-center">
+										<span style="margin-right: 20px;">Saldo: <h4 id="saldoNasabah"></h4></span>
+										<div>
+											<button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalTabunganMasuk"><i class="ti ti-arrow-down"></i> Masuk</button>
+											<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalTabunganKeluar"><i class="ti ti-arrow-up"></i> Keluar</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 		  </div>
 		</div>
 	</div>
@@ -182,6 +206,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
+      	<h4>Pembayaran Kas</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -200,15 +225,21 @@
       		<h3 class="text-white" id="bayarNominal"></h3>
       	</div>
       </div>
-      <div class="modal-footer d-flex justify-content-center">
-      	<form id="formBayar" method="POST">
-      		<input type="hidden" name="id_periode" id="inputHiddenIdPeriode">
-      		<input type="hidden" name="id_anggota" id="inputHiddenIdAnggota">
-      		<input type="hidden" name="nominal" id="inputHiddenNominal">
-      		<div class="d-flex justify-content-center">
-			    <button type="button" class="btn btn-primary bayarTanggungan text-center" id="simpanTransaksi"><i class="ti ti-cash"></i>Konfirmasi pembayaran</button>
-      		</div>
-      	</form>
+      <div class="modal-footer d-flex justify-content-between">
+      		<span>Tabungan : <strong id="infoSaldoViaTabungan"></strong></span>
+	      	<form id="formBayar" method="POST">
+	      		<input type="hidden" name="id_periode" id="inputHiddenIdPeriode">
+	      		<input type="hidden" name="id_anggota" id="inputHiddenIdAnggota">
+	      		<input type="hidden" name="nominal" id="inputHiddenNominal">
+	      		<input type="hidden" name="saldo" id="inputHiddenSaldo">
+	      		<div class="d-flex justify-content-end align-items-center">
+	      		</div>
+	      	</form>
+	      	<div>
+	      		<button type="button" class="btn btn-success bayarTanggungan text-center" id="simpanTransaksiViaTabungan"><i class="ti ti-database"></i>Via Tabungan</button>
+				    <button type="button" class="btn btn-primary bayarTanggungan text-center" id="simpanTransaksi"><i class="ti ti-cash"></i>Bayar Tunai</button>
+	      	</div>
+      	</div>
       </div>
     </div>
   </div>
@@ -308,11 +339,66 @@
     </div>
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="modalTabunganMasuk" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+      	<h4>Isi saldo tabungan</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      	<span>Saldo: <h4 id="saldoNasabahModalMasuk"></h4></span>
+      	<form id="formTabunganMasuk">
+      		<div class="input-group mb-3">
+						<span class="input-group-text"><i class="ti ti-arrow-down"></i></span>
+						<div class="form-floating">
+							<input type="hidden" name="id_nasabah" id="inputHiddenIdNasabahMasuk">
+              <input type="number" class="form-control" id="floatingNominalTabunganMasuk" name="nominal_masuk" placeholder="Nominal yang dimasukkan">
+              <label for="floatingNominalTabunganMasuk">Nominal yang dimasukkan</label>
+            </div>
+					</div>
+      	</form>
+      </div>
+      <div class="modal-footer">
+		    <button type="button" class="btn btn-primary" id="prosesTabunganMasuk"><i class="ti ti-arrow-down"></i>Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modalTabunganKeluar" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+      	<h4>Tarik saldo tabungan</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      	<span>Saldo: <h4 id="saldoNasabahModalKeluar"></h4></span>
+      	<form id="formTabunganKeluar">
+      		<div class="input-group mb-3">
+						<span class="input-group-text"><i class="ti ti-arrow-up"></i></span>
+						<div class="form-floating">
+							<input type="hidden" name="id_nasabah" id="inputHiddenIdNasabahKeluar">
+              <input type="text" class="form-control" id="floatingTarikSaldoTabungan" placeholder="Nominal yang ditarik" name="nominal_keluar">
+              <label for="floatingTarikSaldoTabungan">Nominal yang ditarik</label>
+            </div>
+					</div>
+      	</form>
+      </div>
+      <div class="modal-footer">
+		    <button type="button" class="btn btn-primary" id="prosesTabunganKeluar"><i class="ti ti-arrow-up"></i>Tarik</button>
+      </div>
+    </div>
+  </div>
+</div>
 <?php $this->load->view('template/foot') ?>
 <script type="text/javascript">
 	$(document).ready(function(){
 		// Tampilkan mode default
 		$('#selectPembayar').load('<?= site_url('ajax/get_pembayar') ?>');
+		$('#pilihNasabah').load('<?= site_url('ajax/pilih_nasabah') ?>');
 		$('#totalSaldo').load('<?= site_url('ajax/get_saldo') ?>');
 		$('#modalTotalSaldo').load('<?= site_url('ajax/get_saldo') ?>');
 
@@ -340,6 +426,42 @@
 		    $('#modalBerhasilTransaksi').modal('show');
 		    $('#pilihIdAnggota').val('');
 				$('#selectPembayar').load('<?= site_url('ajax/get_pembayar') ?>');
+			})
+			.fail(function(respon){
+				alert('gagal');
+			});
+		});
+
+		$('#simpanTransaksiViaTabungan').click(function(event){
+			event.preventDefault();//cegah form submit default
+				var id_anggota = $('input[name="id_anggota"]').val();
+		    var id_periode = $('input[name="id_periode"]').val();
+		    var nominal = $('input[name="nominal"]').val();
+		    var saldo = $('input[name="saldo"]').val();
+
+			$.ajax({
+				url:'<?= site_url('ajax/simpan_pemasukan_via_tabungan') ?>',
+				type:'POST',
+				dataType:'json',
+				data:{
+					id_anggota:id_anggota,
+					id_periode:id_periode,
+					nominal:nominal,
+					saldo:saldo
+				}
+			})
+			.done(function(respon){
+				if(respon.success === false) {
+		        alert('Saldo tidak mencukupi untuk penarikan');
+		    } else {
+					$('#totalSaldo').load('<?= site_url('ajax/get_saldo') ?>');
+					$('#modalTotalSaldo').load('<?= site_url('ajax/get_saldo') ?>');
+					$('#infoAnggota').hide();
+					$('#modalCekBayar').modal('hide');
+			    $('#modalBerhasilTransaksi').modal('show');
+			    $('#pilihIdAnggota').val('');
+					$('#selectPembayar').load('<?= site_url('ajax/get_pembayar') ?>');
+		    }
 			})
 			.fail(function(respon){
 				alert('gagal');
@@ -390,9 +512,84 @@
 		        $('#alertInputSalah').show();
 		    });
 		});
+
+		$('#prosesTabunganMasuk').click(function(event){
+		    event.preventDefault();
+
+		    var id_anggota = $('input[name="id_nasabah"]').val(); // Ambil id nasabah dengan benar
+		    var nominal = $('input[name="nominal_masuk"]').val(); // Ambil nominal dengan benar
+
+		    $.ajax({
+		        url: '<?= site_url('ajax/tabungan_masuk') ?>',
+		        type: 'POST',
+		        dataType: 'json',
+		        data: {
+		            id_anggota: id_anggota,
+		            nominal: nominal
+		        }
+		    })
+		    .done(function(respon){
+		        $('#modalTabunganMasuk').modal('hide');
+		        $('#modalBerhasilTransaksi').modal('show');
+		        $('#infoNasabah').hide();
+		    })
+		    .fail(function(respon){
+		        alert('Gagal melakukan pengisian saldo');
+		    });
+		});
+
+		$('#formTabunganMasuk').submit(function(event){
+		    event.preventDefault();
+
+		    var id_anggota = $('input[name="id_nasabah"]').val(); // Ambil id nasabah dengan benar
+		    var nominal = $('input[name="nominal_masuk"]').val(); // Ambil nominal dengan benar
+
+		    $.ajax({
+		        url: '<?= site_url('ajax/tabungan_masuk') ?>',
+		        type: 'POST',
+		        dataType: 'json',
+		        data: {
+		            id_anggota: id_anggota,
+		            nominal: nominal
+		        }
+		    })
+		    .done(function(respon){
+		        $('#modalTabunganMasuk').modal('hide');
+		        $('#modalBerhasilTransaksi').modal('show');
+		        $('#infoNasabah').hide();
+		    })
+		    .fail(function(respon){
+		        alert('Gagal melakukan pengisian saldo');
+		    });
+		});
+
+		$('#prosesTabunganKeluar').click(function(event){
+		    event.preventDefault();
+
+		    var id_anggota = $('input[name="id_nasabah"]').val(); // Ambil id nasabah dengan benar
+		    var nominal = $('input[name="nominal_keluar"]').val(); // Ambil nominal dengan benar
+
+		    $.ajax({
+		        url: '<?= site_url('ajax/tabungan_keluar') ?>',
+		        type: 'POST',
+		        dataType: 'json',
+		        data: {
+		            id_anggota: id_anggota,
+		            nominal: nominal
+		        }
+		    })
+		    .done(function(respon){
+		        if(respon.success === false) {
+				        alert('Saldo tidak mencukupi untuk penarikan');
+				    } else {
+				        $('#modalTabunganKeluar').modal('hide');
+				        $('#modalBerhasilTransaksi').modal('show');
+				        $('#infoNasabah').hide();
+				    }
+		    })
+		    .fail(function(respon){
+		        alert('Gagal melakukan penarikan saldo');
+		    });
+		});
 	});
 </script>
-
-			
-
-

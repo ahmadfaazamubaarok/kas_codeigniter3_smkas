@@ -30,6 +30,7 @@
 	              </td>
 	              <td class="bg-transparent"><?= $anggota->id_anggota ?></td>
 	              <td class="bg-transparent"><strong><?= $anggota->nama_anggota ?></strong><?php if ($this->session->flashdata('user_baru') === $anggota->id_anggota): ?><span class="badge bg-success mx-3">Baru</span><?php endif ?></td>
+	              <td class="bg-transparent">Tabungan: <strong>Rp <?= $anggota->saldo ?></strong></td>
 	              <td class="text-end rounded-end bg-transparent">
               		<span class="text-bold mx-3 badge bg-<?php if (count($anggota->hutang) <= 0) {echo "success";} else {echo "danger";} ?>" data-aos="flip-left" data-aos-delay="400"><?php if (count($anggota->hutang) <= 0) {echo "Lunas";} else {echo "Belum Lunas";} ?></span>
                   <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $anggota->id_anggota ?>" aria-expanded="false" aria-controls="collapseThree" data-aos="zoom-out" data-aos-delay="500">
@@ -83,45 +84,103 @@
                   <div class="accordion-item">
                     <div id="info<?= $anggota->id_anggota ?>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                       <div class="accordion-body">
-                  			<div class="mb-4">
+                  			<div class="mb-4 d-flex justify-content-between">
                             <?php
                             	$total_hutang = 0;
                             	foreach ($anggota->hutang as $hutang){
                               	$total_hutang += $hutang->nominal;
                             	}
                             ?>
-                            <span>Tanggungan kas <strong><?= $anggota->nama_anggota ?></strong>:</span>
-                            <br>
-                            <span>Total tanggungan kas:<strong><?= $total_hutang ?></strong></span>
+                            <span>Total tanggungan <?= $anggota->nama_anggota ?>:<h5>Rp <?= $total_hutang ?></h5></span>
+		                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+													     <li class="nav-item" role="presentation">
+													       <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#hutang<?= $anggota->id_anggota ?>" type="button" role="tab" aria-controls="pills-home" aria-selected="true"><i class="ti ti-cash"></i> Hutang</button>
+													     </li>
+													     <li class="nav-item" role="presentation">
+													       <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#tabungan<?= $anggota->id_anggota ?>" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"><i class="ti ti-database"></i> Tabungan</button>
+													     </li>
+													  </ul>
                         </div>
-                        <table class="table table-borderless text-nowrap align-middle mb-0">
-                        	<tbody>
-                        		<?php $urut = 1 ?>
-                        		<?php foreach ($anggota->hutang as $hutang): ?>
-                        			<tr class="bg-light">
-									              <td class="rounded-start bg-transparent">
-									                <div class="d-flex align-items-center gap-3">
-									                  <div>
-									                    <h6 class="mb-0"><?= $urut ?>.</h6>
-									                  </div>
-									                </div>
-									              </td>
-									              <td class="bg-transparent"><?= $hutang->id_hutang ?></td>
-									              <td class="bg-transparent"><?= $hutang->periode ?></td>
-									              <td class="bg-transparent">Rp<strong><?= $hutang->nominal ?></strong></td>
-									              <td class="text-end rounded-end bg-transparent">
-								                  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#hutang<?= $hutang->id_hutang ?>" aria-expanded="false" aria-controls="collapseThree">
-								                    <i class="ti ti-cash"></i>Bayar
-								                  </button>
-									              </td>
-									            </tr>
-									            <tr>
-									            	<td colspan="0"></td>
-									            </tr>
-									           <?php $urut++; ?>
-                        		<?php endforeach ?>
-                        	</tbody>
-                        </table>
+                        <div class="tab-content" id="pills-tabContent">
+                           <div class="tab-pane fade show active" id="hutang<?= $anggota->id_anggota ?>" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+                           	<?php if (count($anggota->hutang) > 0): ?>
+			                        <table class="table table-borderless text-nowrap align-middle mb-0">
+			                        	<tbody>
+			                        		<?php $urut = 1 ?>
+			                        		<?php foreach ($anggota->hutang as $hutang): ?>
+			                        			<tr class="bg-light">
+												              <td class="rounded-start bg-transparent">
+												                <div class="d-flex align-items-center gap-3">
+												                  <div>
+												                    <h6 class="mb-0"><?= $urut ?>.</h6>
+												                  </div>
+												                </div>
+												              </td>
+												              <td class="bg-transparent"><?= $hutang->id_hutang ?></td>
+												              <td class="bg-transparent"><?= $hutang->periode ?></td>
+												              <td class="bg-transparent">Rp<strong><?= $hutang->nominal ?></strong></td>
+												              <td class="text-end rounded-end bg-transparent">
+											                  <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#hutang<?= $hutang->id_hutang ?>" aria-expanded="false" aria-controls="collapseThree">
+											                    <i class="ti ti-cash"></i>Bayar
+											                  </button>
+												              </td>
+												            </tr>
+												            <tr>
+												            	<td colspan="0"></td>
+												            </tr>
+												           <?php $urut++; ?>
+			                        		<?php endforeach ?>
+			                        	</tbody>
+			                        </table>
+			                        <div style="position: relative;">
+				                        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; z-index: 1;">
+				                            <span>End of hutang <?= $anggota->nama_anggota ?></span>
+				                        </div>
+				                        <hr style="z-index: 0; position: relative;">
+					                    </div>
+                           	<?php else: ?>
+                           		<div class="alert alert-success text-center">Tidak ada tanggungan kas.</div>
+                           	<?php endif ?>
+                           </div>
+                           <div class="tab-pane fade show" id="tabungan<?= $anggota->id_anggota ?>" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+                           	<?php if (count($anggota->tabungan) > 0): ?>
+                           	<table class="table table-borderless text-nowrap align-middle mb-0">
+			                        	<tbody>
+			                        		<?php $urut = 1 ?>
+			                        		<?php foreach ($anggota->tabungan as $tabungan): ?>
+			                        			<tr class="bg-light">
+												              <td class="rounded-start bg-transparent">
+												                <div class="d-flex align-items-center gap-3">
+												                  <div>
+												                    <h6 class="mb-0"><?= $urut ?>.</h6>
+												                  </div>
+												                </div>
+												              </td>
+												              <td class="bg-transparent"><?= $tabungan->id_tabungan ?></td>
+												              <td class="bg-transparent"><?= $tabungan->waktu ?></td>
+												              <td class="bg-transparent">Rp<strong><?= $tabungan->nominal ?></strong></td>
+												              <td class="bg-transparent text-end">
+												              	<span class="badge bg-<?php if ($tabungan->keterangan === 'masuk'){echo "success";}else{echo "danger";} ?>"><?= $tabungan->keterangan ?></span>
+												              </td>
+												            </tr>
+												            <tr>
+												            	<td colspan="0"></td>
+												            </tr>
+												           <?php $urut++; ?>
+			                        		<?php endforeach ?>
+			                        	</tbody>
+			                        </table>
+				                    <div style="position: relative;">
+				                        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; z-index: 1;">
+				                            <span>End of tabungan <?= $anggota->nama_anggota ?></span>
+				                        </div>
+				                        <hr style="z-index: 0; position: relative;">
+				                    </div>
+			                      <?php else: ?>
+                           		<div class="alert alert-warning text-center">Belum ada catatan tabungan.</div>
+                           	<?php endif ?>
+                           </div>
+                         </div>
                       </div>
                     </div>
                   </div>
@@ -162,11 +221,12 @@
 <?php endforeach ?>
 <?php foreach ($data_anggota as $anggota): ?>
 	<?php foreach ($anggota->hutang as $hutang): ?>
-		<!-- Modal -->
+			<!-- Modal -->
 			<div class="modal fade modalBayar" id="hutang<?= $hutang->id_hutang ?>" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 			  <div class="modal-dialog modal-dialog-centered">
 			    <div class="modal-content">
 			      <div class="modal-header">
+			      	<h4>Pembayaran Kas</h4>
 			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			      </div>
 			      <div class="modal-body">
@@ -185,16 +245,22 @@
 			      		<h3 class="text-white">Rp <?= $hutang->nominal ?></h3>
 			      	</div>
 			      </div>
-			      <div class="modal-footer d-flex justify-content-center">
-			      	<form id="formBayar" method="POST">
-			      		<input type="hidden" name="id_periode" value="<?= $hutang->id_periode ?>">
-			      		<input type="hidden" name="id_hutang"  value="<?= $hutang->id_hutang ?>">
-			      		<input type="hidden" name="id_anggota" value="<?= $anggota->id_anggota ?>">
-			      		<input type="hidden" name="nominal"    value="<?= $hutang->nominal ?>">
-			      		<div class="d-flex justify-content-center">
-						    	<button type="button" class="btn btn-primary bayarTanggungan text-center"><i class="ti ti-cash"></i>Konfirmasi pembayaran</button>
-			      		</div>
-			      	</form>
+			      <div class="modal-footer d-flex justify-content-between">
+			      		<span>Tabungan : <strong><?= $anggota->saldo ?></strong></span>
+				      	<form id="formBayarTanggungan" method="POST">
+				      		<input type="hidden" name="id_periode" value="<?= $hutang->id_periode ?>">
+			      			<input type="hidden" name="id_hutang"  value="<?= $hutang->id_hutang ?>">
+			      			<input type="hidden" name="id_anggota" value="<?= $anggota->id_anggota ?>">
+			      			<input type="hidden" name="nominal" value="<?= $hutang->nominal ?>">
+				      		<input type="hidden" name="saldo" value="<?= $anggota->saldo ?>">
+				      		<div class="d-flex justify-content-end align-items-center">
+				      		</div>
+				      	</form>
+				      	<div>
+				      		<button type="button" class="btn btn-success simpanTransaksiViaTabungan text-center" id="simpanTransaksiViaTabungan"><i class="ti ti-database"></i>Via Tabungan</button>
+							    <button type="button" class="btn btn-primary simpanTransaksi text-center" id="simpanTransaksi"><i class="ti ti-cash"></i>Bayar Tunai</button>
+				      	</div>
+			      	</div>
 			      </div>
 			    </div>
 			  </div>
@@ -354,16 +420,40 @@
 	          alert('Gagal menyimpan perubahan: ' + textStatus);
 	      });
 	  });
-		$(document).on('click', '.bayarTanggungan', function(event){
+		$(document).on('click', '.simpanTransaksi', function(event){
 	    event.preventDefault();
 			var modal = $(this).closest('.modal'); // Mendapatkan elemen modal terdekat
-			var form = modal.find('form'); // Mendapatkan elemen form dalam modal
 
 	    // Ambil data dari form
-	    var formBayar = form.serialize();
+	    var formBayar = $('#formBayarTanggungan').serialize();
 
 	    $.ajax({
 	        url: '<?= site_url('ajax/bayar_tanggungan') ?>',
+	        type: 'POST',
+	        data: formBayar,
+	        dataType: 'json'
+	    })
+	    .done(function(respon){
+	    	modal.modal('hide');
+	      $('#modalBerhasilBayar').modal('show');
+	      $('#dataAnggota').load('<?= site_url('ajax/get_anggota') ?>');
+	    })
+	    .fail(function(jqXHR, textStatus, errorThrown){
+	      modal.modal('hide');
+	      $('#modalBerhasilBayar').modal('show');
+	      $('#dataAnggota').load('<?= site_url('ajax/get_anggota') ?>');
+	    });
+		});
+
+		$(document).on('click', '.simpanTransaksiViaTabungan', function(event){
+	    event.preventDefault();
+			var modal = $(this).closest('.modal'); // Mendapatkan elemen modal terdekat
+
+	    // Ambil data dari form
+	    var formBayar = $('#formBayarTanggungan').serialize();
+
+	    $.ajax({
+	        url: '<?= site_url('ajax/bayar_tanggungan_via_tabungan') ?>',
 	        type: 'POST',
 	        data: formBayar,
 	        dataType: 'json'

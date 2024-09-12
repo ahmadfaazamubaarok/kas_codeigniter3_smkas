@@ -38,7 +38,7 @@ class Kas_model extends CI_Model {
 	//---------------------------------------------------------------------------------------------------------------------------
 	//START CRUD tb_anggota
 	public function get_anggota(){
-		$this->db->order_by('id_anggota', 'DESC');
+		$this->db->order_by('nama_anggota', 'ASC');
 		return $this->db->get('tb_anggota')->result();
 	}
 	public function get_anggota_by_id($id_anggota){
@@ -81,6 +81,15 @@ class Kas_model extends CI_Model {
         $query = $this->db->get('tb_anggota');
         return $query->result();
     }
+    public function get_total_saldo_tabungan(){
+	    $this->db->select_sum('saldo');
+	    $query = $this->db->get('tb_anggota'); // Simpan hasil query dalam variabel
+	    if ($query->num_rows() > 0) {
+	        return $query->row()->saldo; // Ambil nilai saldo dari hasil query
+	    } else {
+	        return 0; // Jika tidak ada hasil, kembalikan 0
+	    }
+	}
 	//END CRUD tb_anggota
 	//---------------------------------------------------------------------------------------------------------------------------
 	//START CRUD tb_pemasukan
@@ -228,5 +237,14 @@ class Kas_model extends CI_Model {
 	}
 	public function get_hutang(){
 		return $this->db->get('tb_hutang')->result();
+	}
+	//END CRUD tb_hutang
+	//---------------------------------------------------------------------------------------------------------------------------
+	//START CRUD tb_tabungan
+	public function insert_tabungan($tabungan){
+		return $this->db->insert('tb_tabungan', $tabungan);
+	}
+	public function get_tabungan_by_anggota($id_anggota){
+		return $this->db->get_where('tb_tabungan', ['anggota' => $id_anggota])->result();
 	}
 }
