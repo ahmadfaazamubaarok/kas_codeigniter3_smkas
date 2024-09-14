@@ -3,7 +3,7 @@
 		<select name="id_anggota" class="form-control" placeholder="Pilih anggota" required id="pilihIdNasabah">
 			<option value="">Pilih Anggota</option>
 			<?php foreach ($list_anggota as $anggota): ?>
-				<option value="<?= $anggota->id_anggota ?>"><?= $anggota->nama_anggota ?></option>
+				<option value="<?= $anggota->id_anggota ?>"><?= $anggota->nama_anggota ?> (<?= number_format($anggota->saldo) ?>)</option>
 			<?php endforeach ?>
 		</select>
 	  	<button class="btn btn-primary" id="cariAnggota">

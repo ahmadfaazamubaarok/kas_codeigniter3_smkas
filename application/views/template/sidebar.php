@@ -3,7 +3,9 @@
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <div></div>
+          <div>
+            <h3><?= $this->session->userdata('ruang') ?></h3>
+          </div>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
           </div>

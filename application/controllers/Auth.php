@@ -15,6 +15,7 @@ class Auth extends CI_Controller {
 				$periode = $this->kas_model->get_periode_aktif();
 				$this->session->set_userdata('id_bendahara',$bendahara->id_bendahara);
 				$this->session->set_userdata('username',$bendahara->username);
+				$this->session->set_userdata('ruang',$bendahara->ruang);
 				$this->session->set_userdata('periode',$periode);
 				$this->session->set_flashdata('welcome','welcome');
 				redirect('page');

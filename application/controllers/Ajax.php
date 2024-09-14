@@ -24,8 +24,8 @@ class Ajax extends CI_Controller{
 				'id_periode'	=> $periode->id_periode,
 				'nama_anggota'	=> $pembayar->nama_anggota,
 				'periode' 		=> $periode->periode,
-				'nominal'		=> $periode->nominal,
-				'saldo'			=> $pembayar->saldo
+				'nominal'		=> number_format($periode->nominal),
+				'saldo'			=> number_format($pembayar->saldo)
 			];
 		} else {
 			$info = [
@@ -150,7 +150,7 @@ class Ajax extends CI_Controller{
 	                'hasil' => FALSE,
 	                'pesan' => 'Gagal melakukan penarikan karena nominal lebih besar dari saldo yang ada.',
 	                'nominal' => $nominal,
-	                'saldo' => $saldo->nominal
+	                'saldo' => number_format($saldo->nominal)
 	            ];
 	        } else {
 	            $kurangi_saldo = $this->kas_model->kurangi_saldo($nominal);
@@ -172,14 +172,14 @@ class Ajax extends CI_Controller{
 	                    'hasil'		=> TRUE,
 	                    'pesan'		=> 'Berhasil melakukan penarikan saldo.',
 	                    'nominal' 	=> $nominal,
-	                    'saldo' 	=> $saldo_baru->nominal
+	                    'saldo' 	=> number_format($saldo_baru->nominal)
 	                ];
 	            } else {
 	                $info = [
 	                    'hasil' => FALSE,
 	                    'pesan' => 'Gagal melakukan penarikan.',
 	                    'nominal' => $nominal,
-	                    'saldo' => $saldo->nominal
+	                    'saldo' => number_format($saldo->nominal)
 	                ];
 	            }
 	        }
@@ -188,7 +188,7 @@ class Ajax extends CI_Controller{
 	            'hasil' => FALSE,
 	            'pesan' => 'Gagal melakukan penarikan.',
 	            'nominal' => $nominal,
-	            'saldo' => $saldo->nominal
+	            'saldo' => number_format($saldo->nominal)
 	        ];
 	    }
 
@@ -604,7 +604,7 @@ class Ajax extends CI_Controller{
 				'pesan'			=> 'Menampilkan data pembayar.',
 				'id_anggota'	=> $pembayar->id_anggota,
 				'nama_anggota'	=> $pembayar->nama_anggota,
-				'saldo'			=> $pembayar->saldo
+				'saldo'			=> number_format($pembayar->saldo)
 			];
 		} else {
 			$info = [

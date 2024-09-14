@@ -30,7 +30,7 @@
                             </td>
                             <td class="bg-transparent"><?= $periode->id_periode ?></td>
                             <td class="bg-transparent"><?= $periode->periode ?></td>
-                            <td class="bg-transparent">Rp <strong><?= $periode->nominal ?></strong>,00<i class="ti ti-chevron-up text-danger ms-1 fs-4"></i></td>
+                            <td class="bg-transparent">Rp <strong><?= number_format($periode->nominal) ?></strong>,00<i class="ti ti-chevron-up text-danger ms-1 fs-4"></i></td>
                             <td class="text-end rounded-end bg-transparent">
                             	<span class="mx-3 badge bg-<?php if ($periode->status === 'aktif') {echo "success";} else {echo "danger";} ?>" data-aos="flip-left" data-aos-delay="400"><?php if ($periode->status === 'aktif') {echo "Aktif";} else {echo "NonAktif";} ?></span>
                                 <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $periode->id_periode ?>" aria-expanded="false" aria-controls="collapseTwo" data-aos="zoom-out" data-aos-delay="500">
@@ -80,7 +80,7 @@
                                                         <div class="input-group mb-2">
                                                             <span class="input-group-text">Rp</span>
                                                             <div class="form-floating">
-                                                                <input name="nominal" value="<?= $periode->nominal ?>" class="form-control" id="nominalPeriode">
+                                                                <input name="nominal" value="<?= number_format($periode->nominal) ?>" class="form-control" id="nominalPeriode">
                                                                 <label for="nominalPeriode">Nominal wajib</label>
                                                             </div>
                                                         </div>
@@ -155,7 +155,7 @@
                                                              </div>
                                                            </td>
                                                            <td class="bg-transparent"><?= $pemasukan->id_pemasukan ?></td>
-                                                           <td class="bg-transparent">Rp <strong><?= $pemasukan->nominal ?></strong>,00<i class="ti ti-chevron-down text-success ms-1 fs-4"></i></td>
+                                                           <td class="bg-transparent">Rp <strong><?= number_format($pemasukan->nominal) ?></strong>,00<i class="ti ti-chevron-down text-success ms-1 fs-4"></i></td>
                                                            <td class="bg-transparent"><?= $pemasukan->waktu ?></td>
                                                            <td class="text-end rounded-end bg-transparent">
                                                                <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $pemasukan->id_pemasukan ?>" aria-expanded="false" aria-controls="collapseThree">
@@ -206,7 +206,7 @@
                                                              </div>
                                                            </td>
                                                            <td class="bg-transparent"><?= $pengeluaran->id_pengeluaran ?></td>
-                                                           <td class="bg-transparent">Rp <strong><?= $pengeluaran->nominal ?></strong>,00<i class="ti ti-chevron-up text-danger ms-1 fs-4"></i></td>
+                                                           <td class="bg-transparent">Rp <strong><?= number_format($pengeluaran->nominal) ?></strong>,00<i class="ti ti-chevron-up text-danger ms-1 fs-4"></i></td>
                                                            <td class="bg-transparent"><?= $pengeluaran->waktu ?></td>
                                                            <td class="text-end rounded-end bg-transparent">
                                                                <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $pengeluaran->id_pengeluaran ?>" aria-expanded="false" aria-controls="collapseThree">

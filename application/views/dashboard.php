@@ -6,7 +6,7 @@
 		<a href="<?= site_url('page') ?>">
 			<div class="alert alert-primary border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="0">
 				<img src="<?= base_url().'/assets/icon/saldo.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_saldo->nominal ?></span>
+				<span class="fs-6 mt-3 fw-bolder">Rp <?= number_format($total_saldo->nominal) ?></span>
 				<span>Total Saldo</span>
 			</div>
 		</a>
@@ -15,7 +15,7 @@
 		<a href="<?= site_url('page/periode') ?>">
 			<div class="alert alert-success border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="100">
 				<img src="<?= base_url().'/assets/icon/periode.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder"><?= $total_periode ?></span>
+				<span class="fs-6 mt-3 fw-bolder"><?= number_format($total_periode) ?></span>
 				<span>Total Periode</span>
 			</div>
 		</a>
@@ -24,7 +24,7 @@
 		<a href="<?= site_url('page/transaksi') ?>">
 			<div class="alert alert-info border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="200">
 				<img src="<?= base_url().'/assets/icon/pemasukan.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_pemasukan ?></span>
+				<span class="fs-6 mt-3 fw-bolder">Rp <?= number_format($total_pemasukan) ?></span>
 				<span>Total Kas Masuk</span>
 			</div>
 		</a>
@@ -33,7 +33,7 @@
 		<a href="<?= site_url('page/open_pengeluaran') ?>">
 			<div class="alert alert-danger border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="300">
 				<img src="<?= base_url().'/assets/icon/pengeluaran.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_pengeluaran ?></span>
+				<span class="fs-6 mt-3 fw-bolder">Rp <?= number_format($total_pengeluaran) ?></span>
 				<span>Total Kas Keluar</span>
 			</div>
 		</a>
@@ -42,7 +42,7 @@
 		<a href="<?= site_url('page/anggota') ?>">
 			<div class="alert alert-warning border-0 d-flex justify-content-center align-items-center flex-column" data-aos="flip-left" data-aos-delay="400">
 				<img src="<?= base_url().'/assets/icon/anggota.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder"><?= $total_anggota ?></span>
+				<span class="fs-6 mt-3 fw-bolder"><?= number_format($total_anggota) ?></span>
 				<span>Total Anggota</span>
 			</div>
 		</a>
@@ -51,7 +51,7 @@
 		<a href="<?= site_url('page/anggota') ?>">
 			<div class="alert alert-dark border-0 d-flex justify-content-center align-items-center flex-column text-white" data-aos="flip-left" data-aos-delay="500">
 				<img src="<?= base_url().'/assets/icon/hutang.png' ?>" style="width:80px;">
-				<span class="fs-6 mt-3 fw-bolder">Rp <?= $total_saldo_tabungan ?></span>
+				<span class="fs-6 mt-3 fw-bolder">Rp <?= number_format($total_saldo_tabungan) ?></span>
 				<span>Total Saldo Tabungan</span>
 			</div>
 		</a>

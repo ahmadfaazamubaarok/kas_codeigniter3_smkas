@@ -30,7 +30,7 @@
 	              </td>
 	              <td class="bg-transparent"><?= $anggota->id_anggota ?></td>
 	              <td class="bg-transparent"><strong><?= $anggota->nama_anggota ?></strong><?php if ($this->session->flashdata('user_baru') === $anggota->id_anggota): ?><span class="badge bg-success mx-3">Baru</span><?php endif ?></td>
-	              <td class="bg-transparent">Tabungan: <strong>Rp <?= $anggota->saldo ?></strong></td>
+	              <td class="bg-transparent">Tabungan: <strong>Rp <?= number_format($anggota->saldo) ?></strong></td>
 	              <td class="text-end rounded-end bg-transparent">
               		<span class="text-bold mx-3 badge bg-<?php if (count($anggota->hutang) <= 0) {echo "success";} else {echo "danger";} ?>" data-aos="flip-left" data-aos-delay="400"><?php if (count($anggota->hutang) <= 0) {echo "Lunas";} else {echo "Belum Lunas";} ?></span>
                   <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#info<?= $anggota->id_anggota ?>" aria-expanded="false" aria-controls="collapseThree" data-aos="zoom-out" data-aos-delay="500">

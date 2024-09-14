@@ -100,7 +100,14 @@
                   <span class="input-group-text"><i class="ti ti-user"></i></span>
                   <div class="form-floating">
                     <input type="text" name="username" class="form-control" placeholder="Password" required value="<?= $this->session->userdata('username') ?>">
-                    <label for="floatingInputGroup1">Nama</label>
+                    <label for="floatingInputGroup1">Ruang</label>
+                  </div>
+                </div>
+                <div class="input-group mb-2">
+                  <span class="input-group-text"><i class="ti ti-user"></i></span>
+                  <div class="form-floating">
+                    <input type="text" name="ruang" class="form-control" placeholder="Password" required value="<?= $this->session->userdata('ruang') ?>">
+                    <label for="floatingInputGroup1">Ruang</label>
                   </div>
                 </div>
                 <div class="d-flex justify-content-center">
